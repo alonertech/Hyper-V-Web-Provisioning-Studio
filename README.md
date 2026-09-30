@@ -4,6 +4,8 @@
 **Platform:** Windows / Hyper-V  
 **Project status:** Public development / lab validation
 
+**Release/source note:** The `v3.1.0` tag is the frozen source snapshot for the published v3.1.0 release. The `main` branch may contain post-release fixes and ongoing development. Do not move or recreate the existing `v3.1.0` tag to match `main`; publish future changes under a new version tag after validation.
+
 Hyper-V Web Provisioning Studio is a Windows-native web management tool for Hyper-V VM provisioning and selected VM/network management tasks. It is designed for local and remote Hyper-V administration in standalone/workgroup and domain-capable Windows environments.
 
 ## What this release contains
