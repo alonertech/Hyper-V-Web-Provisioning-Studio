@@ -17,7 +17,7 @@
   },
   "professional": {
     "embeddedStore": true,
-    "defaultRole": "Administrator",
+    "defaultRole": "Viewer",
     "auditIntegrity": "sha256-chain",
     "policyEnforcementDefault": false,
     "jobHistoryLimit": 500,
