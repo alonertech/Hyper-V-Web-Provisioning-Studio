@@ -192,6 +192,8 @@ Current controls include:
 - Role-based management API permissions
 - Certificate validation for the selected WinRM HTTPS path
 
+On a fresh installation, the first Windows identity that starts the portal is persisted as the initial Administrator mapping. Subsequent identities that are not explicitly mapped receive the least-privileged Viewer role.
+
 The current development package still uses PowerShell `ExecutionPolicy Bypass` for compatibility with unsigned development builds. A commercial distribution should move to signed PowerShell, signed binaries/installer media, formal code-signing policy, threat modeling, dependency governance and an enterprise authentication architecture.
 
 See [`docs/SECURITY.md`](docs/SECURITY.md).
