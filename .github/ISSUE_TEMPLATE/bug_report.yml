@@ -1,0 +1,59 @@
+name: Bug report
+description: Report a reproducible problem
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please remove credentials, private keys, confidential host data and production audit contents.
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      placeholder: 3.1.0 Professional
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows build
+    validations:
+      required: true
+  - type: dropdown
+    id: target
+    attributes:
+      label: Target type
+      options:
+        - Local Hyper-V
+        - Remote Hyper-V
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      options:
+        - Standalone/workgroup
+        - Domain
+        - Other
+  - type: textarea
+    id: operation
+    attributes:
+      label: Operation
+      description: What were you trying to do?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: Actual result
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result

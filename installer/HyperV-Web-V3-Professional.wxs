@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="Hyper-V Web Provisioning Studio Professional" Manufacturer="YOUR-COMPANY" Version="3.1.0.0" UpgradeCode="PUT-GUID-HERE">
+    <MajorUpgrade DowngradeErrorMessage="A newer version of Hyper-V Web Provisioning Studio is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+    <Feature Id="Main" Title="Hyper-V Web Provisioning Studio Professional" Level="1">
+      <ComponentGroupRef Id="MainFiles" />
+    </Feature>
+  </Package>
+</Wix>

@@ -1,0 +1,13 @@
+Hyper-V Web Provisioning Studio v3.1.0 Professional — public source repository
+
+This repository contains the application source, PowerShell management scripts, web UI, configuration templates, documentation, test/validation scripts and installer source.
+
+The public source repository intentionally excludes:
+- bundled Node runtime (node/node.exe)
+- node_modules
+- live ProgramData management database
+- live audit JSONL files
+- live job artifacts
+- environment-specific credentials, host information or secrets
+
+The tested self-contained runtime is distributed separately as the GitHub Release ZIP.

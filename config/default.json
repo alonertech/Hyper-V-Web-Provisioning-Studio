@@ -1,0 +1,26 @@
+{
+  "port": 3000,
+  "bindAddress": "127.0.0.1",
+  "defaultStoragePath": "C:\\Hyper-V\\VMs",
+  "defaults": {
+    "generation": 2,
+    "cpuCount": 2,
+    "memoryMB": 4096,
+    "diskSizeGB": 60,
+    "diskType": "Dynamic",
+    "secureBoot": true,
+    "secureBootTemplate": "MicrosoftWindows",
+    "enableVTPM": false,
+    "vlanTagging": false,
+    "vlanId": 1,
+    "rollbackOnFailure": true
+  },
+  "professional": {
+    "embeddedStore": true,
+    "defaultRole": "Administrator",
+    "auditIntegrity": "sha256-chain",
+    "policyEnforcementDefault": false,
+    "jobHistoryLimit": 500,
+    "auditHistoryLimit": 5000
+  }
+}

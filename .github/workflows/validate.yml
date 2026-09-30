@@ -1,0 +1,65 @@
+name: Validate
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Check Node syntax
+        shell: pwsh
+        run: |
+          node --check server/server.js
+          node --check public/app.js
+
+      - name: Check PowerShell syntax
+        shell: pwsh
+        run: |
+          $files = Get-ChildItem -Path launcher,powershell,tools -Filter *.ps1 -Recurse
+          $failed = $false
+          foreach ($file in $files) {
+            $tokens = $null
+            $errors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile($file.FullName, [ref]$tokens, [ref]$errors) | Out-Null
+            if ($errors.Count -gt 0) {
+              $failed = $true
+              Write-Host "Syntax errors in $($file.FullName)"
+              $errors | ForEach-Object { Write-Host $_.Message }
+            }
+          }
+          if ($failed) { exit 1 }
+
+      - name: Verify public repository is sanitized
+        shell: pwsh
+        run: |
+          # These values are intentionally constructed so this workflow does not flag itself.
+          $forbidden = @(
+            ('192' + '.168.0.193'),
+            ('phy02' + '.inhouse.com'),
+            ('TEST' + 'USER')
+          )
+          $files = Get-ChildItem -Recurse -File | Where-Object {
+            $_.FullName -notmatch '\\node_modules\\|\\.git\\'
+          }
+          foreach ($file in $files) {
+            $content = Get-Content -LiteralPath $file.FullName -Raw -ErrorAction SilentlyContinue
+            foreach ($value in $forbidden) {
+              if ($content -like "*$value*") {
+                Write-Error "Environment-specific value detected in $($file.FullName)"
+              }
+            }
+          }

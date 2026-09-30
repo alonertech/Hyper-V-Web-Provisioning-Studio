@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hyper-V Web Provisioning Studio v3.1.0 Professional</title>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div>
+    <div class="eyebrow">MICROSOFT HYPER-V · PROFESSIONAL</div>
+    <h1>Hyper-V Web Provisioning Studio <span>v3.1.0 Professional</span></h1>
+    <p>VM provisioning, console-style inventory, templates, policy controls, RBAC, and tamper-evident audit history.</p>
+  </div>
+  <div class="status-wrap">
+    <div id="statusBadge" class="status good">Connecting...</div>
+    <div id="targetMeta" class="target-meta"></div>
+    <div class="target-meta" id="userMeta"></div>
+  </div>
+</header>
+
+<main class="page">
+  <nav class="tabs" aria-label="Primary">
+    <button class="tab active" data-tab="dashboard">Dashboard</button>
+    <button class="tab" data-tab="vms">Virtual Machines</button>
+    <button class="tab" data-tab="provision">Provision VM</button>
+    <button class="tab" data-tab="switches">Virtual Switch</button>
+    <button class="tab" data-tab="templates">Templates</button>
+    <button class="tab" data-tab="policies">Policies</button>
+    <button class="tab" data-tab="audit">Audit</button>
+    <button class="tab" data-tab="access">Access</button>
+  </nav>
+
+  <section id="tab-dashboard" class="tab-panel active">
+    <div class="metrics">
+      <div class="metric card"><div class="metric-label">Virtual Machines</div><div id="metricVms" class="metric-value">0</div><div id="metricVmsSub" class="metric-sub">0 running</div></div>
+      <div class="metric card"><div class="metric-label">Virtual Switches</div><div id="metricSwitches" class="metric-value">0</div><div class="metric-sub">Target host inventory</div></div>
+      <div class="metric card"><div class="metric-label">Templates</div><div id="metricTemplates" class="metric-value">0</div><div class="metric-sub">Reusable VM configurations</div></div>
+      <div class="metric card"><div class="metric-label">Enabled Policies</div><div id="metricPolicies" class="metric-value">0</div><div class="metric-sub">Applied during pre-flight</div></div>
+      <div class="metric card"><div class="metric-label">Job History</div><div id="metricJobs" class="metric-value">0</div><div class="metric-sub">Persisted locally</div></div>
+      <div class="metric card"><div class="metric-label">Audit Integrity</div><div id="metricAudit" class="metric-value small">Checking...</div><div id="metricAuditSub" class="metric-sub">SHA-256 chain</div></div>
+    </div>
+    <div class="layout dashboard-layout">
+      <section class="card">
+        <div class="section-head"><div><h2>Target Overview</h2><p>Current Hyper-V target and the last discovered state.</p></div><div class="actions"><a class="btn secondary" href="/api/professional/backup">Backup Data</a><button class="btn secondary" id="refreshDashboardBtn">Refresh</button></div></div>
+        <div id="targetOverview" class="details-grid"></div>
+      </section>
+      <section class="card">
+        <div class="section-head"><div><h2>Recent Jobs</h2><p>Latest persisted provisioning and administration jobs.</p></div><button class="btn secondary" id="refreshJobsBtn">Refresh</button></div>
+        <div class="table-wrap"><table class="data-table"><thead><tr><th>Job</th><th>State</th><th>Created</th><th>Message</th><th>Detail</th></tr></thead><tbody id="jobHistoryRows"><tr><td colspan="5" class="empty">Loading...</td></tr></tbody></table></div>
+      </section>
+    </div>
+  </section>
+
+  <section id="tab-vms" class="tab-panel">
+    <section class="card inventory-card">
+      <div class="section-head">
+        <div><h2>Virtual Machines</h2><p>Hyper-V console-style inventory for the configured target host.</p></div>
+        <div class="toolbar"><span id="vmCount" class="pill">0 VMs</span><button class="btn secondary" id="refreshBtn">Refresh</button></div>
+      </div>
+      <div class="table-wrap"><table class="vm-table"><thead><tr><th>Name</th><th>State</th><th>Generation</th><th>CPU</th><th>Memory</th><th>IP address</th><th>vSwitch</th><th>ISO</th><th>Actions</th></tr></thead><tbody id="vmRows"><tr><td colspan="9" class="empty">Loading target inventory...</td></tr></tbody></table></div>
+    </section>
+  </section>
+
+  <section id="tab-provision" class="tab-panel">
+    <div class="layout">
+      <section class="card">
+        <div class="section-head"><div><h2>Provision a new VM</h2><p>Storage and ISO paths are evaluated on the target Hyper-V host.</p></div><span id="policyHint" class="pill">No active policy blocks</span></div>
+        <form id="vmForm">
+          <div class="grid two"><label>VM Name<input id="vmName" maxlength="63" pattern="[A-Za-z0-9][A-Za-z0-9._-]{0,62}" placeholder="WEB-SRV01" required></label><label>Generation<select id="generation"><option value="2">Generation 2 (UEFI)</option><option value="1">Generation 1 (Legacy)</option></select></label></div>
+          <div class="grid three"><label>vCPU<input id="cpuCount" type="number" min="1" max="64" value="2" required></label><label>Startup RAM (MB)<input id="memoryMB" type="number" min="512" step="512" value="4096" required></label><label>Disk (GB)<input id="diskSizeGB" type="number" min="10" value="60" required></label></div>
+          <div class="grid two compact-panel"><label>Disk Type<select id="diskType"><option value="Dynamic">Dynamic</option><option value="Fixed">Fixed</option></select></label><div><label class="check"><input id="vlanTagging" type="checkbox"><span>Enable access VLAN</span></label><label id="vlanWrap">VLAN ID<input id="vlanId" type="number" min="1" max="4094" value="1"></label></div></div>
+          <div class="grid two"><label>Virtual Switch<select id="vSwitch" required><option value="">Loading...</option></select></label><div class="switch-actions"><div class="hint" id="switchHint">Virtual switches are managed from the Virtual Switch tab.</div></div></div>
+          <div class="grid two"><label>Target host storage path<div class="input-row"><input id="storagePath" required><button type="button" class="btn secondary" id="browseFolderBtn">Browse</button></div></label><label>Target host ISO path<div class="input-row"><input id="isoPath" placeholder="C:\\ISOs\\WindowsServer.iso"><button type="button" class="btn secondary" id="browseIsoBtn">Browse</button></div></label></div>
+          <div class="advanced-panel"><div class="panel-title">Security &amp; boot</div><div class="grid three"><label class="check"><input id="secureBoot" type="checkbox" checked><span>Secure Boot</span></label><label class="check"><input id="enableVTPM" type="checkbox"><span>Virtual TPM</span></label><label>Secure Boot template<select id="secureBootTemplate"><option value="MicrosoftWindows">Microsoft Windows</option><option value="MicrosoftUEFICertificateAuthority">Microsoft UEFI CA</option></select></label></div><div class="hint">When an ISO is supplied, the VM is automatically prepared to boot from DVD first. The ISO remains mounted until you explicitly eject it. The VM remains Off after provisioning.</div></div>
+          <div class="grid one"><label class="check"><input id="rollbackOnFailure" type="checkbox" checked><span>Rollback resources if deployment fails</span></label></div>
+          <div class="actions"><button type="button" class="btn secondary" id="preflightBtn">Run pre-flight validation</button><button type="button" class="btn secondary" id="saveTemplateBtn">Save as template</button><button type="submit" class="btn primary" id="deployBtn">Deploy Virtual Machine</button><button type="button" class="btn danger" id="cancelBtn" disabled>Cancel current job</button></div>
+        </form>
+      </section>
+      <aside class="card console-card"><div class="section-head"><div><h2>Job console</h2><p>Live PowerShell output for provisioning and VM actions.</p></div><button class="btn secondary" id="clearBtn">Clear</button></div><div id="console" class="console" aria-live="polite"></div><div class="job-footer"><span id="jobState">Idle</span><span id="jobId">No job</span></div></aside>
+    </div>
+  </section>
+
+  <section id="tab-switches" class="tab-panel">
+    <section class="card inventory-card">
+      <div class="section-head"><div><h2>Virtual Switches</h2><p>View configured Hyper-V switches, connected VM count, adapter binding, and management access.</p></div><div class="toolbar"><span id="switchCount" class="pill">0 switches</span><button class="btn secondary" id="refreshSwitchesBtn">Refresh</button></div></div>
+      <div class="table-wrap"><table class="data-table"><thead><tr><th>Name</th><th>Type</th><th>Physical Adapter</th><th>Allow Management OS</th><th>Connected VMs</th><th>Notes</th><th>Action</th></tr></thead><tbody id="switchRows"><tr><td colspan="7" class="empty">Loading...</td></tr></tbody></table></div>
+    </section>
+    <div class="layout dashboard-layout">
+      <section class="card">
+        <div class="section-head"><div><h2>Create Virtual Switch</h2><p>Create a new switch on the configured target host.</p></div></div>
+        <form id="createSwitchForm">
+          <label>Switch name<input id="createSwitchName" maxlength="80" placeholder="PROD-vSW" required></label>
+          <label>Switch type<select id="createSwitchType"><option value="External">External</option><option value="Internal">Internal</option><option value="Private">Private</option></select></label>
+          <label id="createAdapterWrap">Physical adapter<select id="createNetAdapter"><option value="">Loading...</option></select></label>
+          <div class="hint" id="createSwitchHint">External switches require a physical adapter that is currently Up.</div>
+          <div class="actions"><button class="btn primary" type="submit">Create switch</button></div>
+        </form>
+      </section>
+      <section class="card">
+        <div class="section-head"><div><h2>Modify Virtual Switch</h2><p>Select a switch above or choose a row action to edit its supported properties.</p></div></div>
+        <form id="modifySwitchForm">
+          <label>Switch name<select id="modifySwitchName" required><option value="">Select a switch</option></select></label>
+          <label>Switch type<select id="modifySwitchType"><option value="External">External</option><option value="Internal">Internal</option><option value="Private">Private</option></select></label>
+          <label id="modifyAdapterWrap">Physical adapter<select id="modifyNetAdapter"><option value="">Loading...</option></select></label>
+          <label class="check"><input id="modifyAllowManagementOS" type="checkbox"><span>Allow management OS</span></label>
+          <label>Notes<input id="modifySwitchNotes" maxlength="1000" placeholder="Optional notes"></label>
+          <div class="hint">Switch name is read-only. Changing type or physical adapter can affect connected VMs and host connectivity.</div>
+          <div class="actions"><button class="btn primary" type="submit">Save switch changes</button></div>
+        </form>
+      </section>
+    </div>
+  </section>
+
+    <section id="tab-templates" class="tab-panel">
+    <section class="card"><div class="section-head"><div><h2>VM Templates</h2><p>Save reusable compute, storage, network, and security defaults.</p></div><button class="btn secondary" id="templatesRefresh">Refresh</button></div><div class="table-wrap"><table class="data-table"><thead><tr><th>Name</th><th>Generation</th><th>CPU</th><th>RAM</th><th>Disk</th><th>Security</th><th>Actions</th></tr></thead><tbody id="templateRows"><tr><td colspan="7" class="empty">Loading...</td></tr></tbody></table></div></section>
+  </section>
+
+  <section id="tab-policies" class="tab-panel">
+    <div class="layout"><section class="card"><div class="section-head"><div><h2>Provisioning Policies</h2><p>Enabled policies are evaluated during pre-flight and deployment.</p></div><button class="btn secondary" id="policiesRefresh">Refresh</button></div><div class="table-wrap"><table class="data-table"><thead><tr><th>Name</th><th>Status</th><th>Gen 2</th><th>Secure Boot</th><th>vTPM</th><th>Minimum</th><th>Actions</th></tr></thead><tbody id="policyRows"><tr><td colspan="7" class="empty">Loading...</td></tr></tbody></table></div></section>
+      <section class="card"><div class="section-head"><div><h2>Create Policy</h2><p>Policy enforcement is optional; no policy is enabled by default.</p></div></div><form id="policyForm"><label>Policy name<input id="policyName" placeholder="Production Baseline" required></label><div class="grid two"><label>Minimum vCPU<input id="policyMinCpu" type="number" min="0" value="0"></label><label>Minimum RAM (MB)<input id="policyMinMemory" type="number" min="0" value="0"></label></div><div class="grid three"><label class="check"><input id="policyGen2" type="checkbox"><span>Require Gen 2</span></label><label class="check"><input id="policySecureBoot" type="checkbox"><span>Require Secure Boot</span></label><label class="check"><input id="policyVTPM" type="checkbox"><span>Require vTPM</span></label></div><label>Approved switches <input id="policySwitches" placeholder="PROD, BACKEND"></label><label>Allowed storage roots <input id="policyRoots" placeholder="D:\\Hyper-V\\Production;E:\\Hyper-V\\Production"></label><label class="check"><input id="policyEnabled" type="checkbox"><span>Enable immediately</span></label><div class="actions"><button class="btn primary" type="submit">Create Policy</button></div></form></section></div>
+  </section>
+
+  <section id="tab-audit" class="tab-panel">
+    <section class="card"><div class="section-head"><div><h2>Audit History</h2><p>Persistent local audit events with SHA-256 chain integrity.</p></div><div class="actions"><button class="btn secondary" id="auditVerifyBtn">Verify Integrity</button><button class="btn secondary" id="auditRefreshBtn">Refresh</button><a class="btn secondary" href="/api/audit/export">Export JSON</a></div></div><div id="auditStatus" class="audit-status">Integrity not checked.</div><div class="table-wrap"><table class="data-table"><thead><tr><th>Timestamp</th><th>Actor</th><th>Action</th><th>Target</th><th>Job</th><th>Outcome</th><th>Hash</th></tr></thead><tbody id="auditRows"><tr><td colspan="7" class="empty">Loading...</td></tr></tbody></table></div></section>
+  </section>
+
+  <section id="tab-access" class="tab-panel">
+    <div class="layout"><section class="card"><div class="section-head"><div><h2>Access Control</h2><p>Professional edition uses the Windows identity running the portal and applies local role mappings.</p></div><button class="btn secondary" id="accessRefresh">Refresh</button></div><div class="identity-card"><div><div class="detail-key">Current identity</div><div id="currentUser" class="detail-value">Loading...</div></div><div><div class="detail-key">Effective role</div><div id="currentRole" class="detail-value">Loading...</div></div></div><div class="table-wrap"><table class="data-table"><thead><tr><th>User</th><th>Role</th><th>Updated</th><th>Action</th></tr></thead><tbody id="accessRows"><tr><td colspan="4" class="empty">Loading...</td></tr></tbody></table></div></section>
+      <section class="card"><h2>Assign Role</h2><p class="section-note">Administrators can map Windows identities to Professional roles.</p><form id="accessForm"><label>Windows user/domain<input id="accessUser" placeholder="DOMAIN\\username" required></label><label>Role<select id="accessRole"><option>Viewer</option><option>Auditor</option><option>Operator</option><option>Administrator</option></select></label><div class="actions"><button class="btn primary" type="submit">Save Role</button></div></form></section></div>
+  </section>
+</main>
+
+
+<div id="modifyVmModal" class="modal hidden"><div class="modal-panel wide-panel"><div class="section-head"><div><h3 id="modifyVmTitle">Modify VM</h3><p id="modifyVmSubtitle"></p></div><button class="btn secondary" id="closeModifyVm">Close</button></div><form id="modifyVmForm">
+  <input id="modifyVmName" type="hidden">
+  <div class="grid two"><label>Virtual disk<select id="modifyDiskPath"><option value="">No disk resize</option></select></label><label>New disk size (GB)<input id="modifyDiskSizeGB" type="number" min="10" max="65536" step="1" placeholder="Leave blank to keep current size"></label></div>
+  <div class="grid one"><label>New VM storage directory<input id="modifyStoragePath" maxlength="260" placeholder="Leave blank to keep current location"></label></div>
+  <div class="grid two"><label>Network adapter<select id="modifyNetworkAdapter"><option value="">No network change</option></select></label><label>Virtual Switch<select id="modifyVSwitch"><option value="">Select switch</option></select></label></div>
+  <div id="modifyVmCurrent" class="audit-status">Storage and disk changes require the VM to be Off. Network-only changes may be applied to a running VM.</div>
+  <div class="modal-actions"><button class="btn secondary" type="button" id="cancelModifyVm">Cancel</button><button class="btn primary" type="submit">Apply VM changes</button></div>
+</form></div></div>
+
+<div id="auditDetailModal" class="modal hidden"><div class="modal-panel wide-panel"><div class="section-head"><div><h3 id="auditDetailTitle">Job detail</h3><p id="auditDetailSubtitle"></p></div><button class="btn secondary" id="closeAuditDetail">Close</button></div><div id="auditDetailBody" class="details-grid"></div></div></div>
+
+<div id="detailsModal" class="modal hidden"><div class="modal-panel wide-panel"><div class="section-head"><div><h3 id="detailsTitle">VM details</h3><p id="detailsSubtitle"></p></div><button class="btn secondary" id="closeDetails">Close</button></div><div id="detailsBody" class="details-grid"></div></div></div>
+<script src="/app.js" defer></script>
+</body>
+</html>

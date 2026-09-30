@@ -1,0 +1,32 @@
+# Node/development dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Local runtime binaries; the tested portable release carries these separately
+node/node.exe
+
+# Hyper-V Web runtime state
+ProgramData/HyperV-Web-V3/data/*.json
+ProgramData/HyperV-Web-V3/data/*.tmp
+ProgramData/HyperV-Web-V3/audit/*.jsonl
+ProgramData/HyperV-Web-V3/jobs/*
+!ProgramData/HyperV-Web-V3/data/.gitkeep
+!ProgramData/HyperV-Web-V3/audit/.gitkeep
+!ProgramData/HyperV-Web-V3/jobs/.gitkeep
+
+# Local editor/OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.user
+*.suo
+
+# Test output
+coverage/
+reports/
+logs/
+*.log

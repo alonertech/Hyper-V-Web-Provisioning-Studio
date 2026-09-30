@@ -1,0 +1,23 @@
+name: Feature request
+description: Suggest an improvement or new capability
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+      description: Describe the administrative or operational problem.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Describe what you would like the tool to do.
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Hyper-V impact
+      description: Note expected effects on VMs, storage or host networking.
