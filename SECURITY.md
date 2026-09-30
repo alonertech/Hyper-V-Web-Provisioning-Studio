@@ -29,3 +29,8 @@ The development package retains PowerShell `ExecutionPolicy Bypass` for compatib
 ## Security roadmap
 
 Planned/desired enterprise controls include formal threat modeling, signed binaries/scripts, SBOM and dependency governance, centralized authentication/SSO, stronger session controls, SIEM integration, vulnerability disclosure process, and independent security review.
+
+
+## Default RBAC behavior
+
+On a fresh installation, the Windows identity that launches the portal is saved as the initial Administrator mapping so the administrator can configure access. After mappings exist, identities without an explicit mapping receive Viewer permissions. The application uses the Windows identity of the portal process; this is not per-browser-user SSO, so keep the portal bound to loopback unless a separately reviewed authentication design is deployed.
