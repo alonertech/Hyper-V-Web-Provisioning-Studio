@@ -56,7 +56,7 @@ function currentIdentity() {
 }
 function roleForIdentity(identity) {
   const mapped = store.get('users').find(x => String(x.username).toLowerCase() === identity.toLowerCase());
-  return mapped?.role || store.get('settings').defaultRole || CONFIG.professional.defaultRole || 'Viewer';
+  return mapped?.role || 'Viewer';
 }
 function hasPermission(permission) {
   const role = roleForIdentity(currentIdentity());
