@@ -4,6 +4,8 @@
 **Platform:** Windows / Hyper-V  
 **Project status:** Public development / lab validation
 
+**Release/source note:** The `v3.1.0` tag is the frozen source snapshot for the published v3.1.0 release. The `main` branch may contain post-release fixes and ongoing development. Do not move or recreate the existing `v3.1.0` tag to match `main`; publish future changes under a new version tag after validation.
+
 Hyper-V Web Provisioning Studio is a Windows-native web management tool for Hyper-V VM provisioning and selected VM/network management tasks. It is designed for local and remote Hyper-V administration in standalone/workgroup and domain-capable Windows environments.
 
 ## What this release contains
@@ -191,6 +193,8 @@ Current controls include:
 - SHA-256 chained audit records
 - Role-based management API permissions
 - Certificate validation for the selected WinRM HTTPS path
+
+On a fresh installation, the first Windows identity that starts the portal is persisted as the initial Administrator mapping. Subsequent identities that are not explicitly mapped receive the least-privileged Viewer role.
 
 The current development package still uses PowerShell `ExecutionPolicy Bypass` for compatibility with unsigned development builds. A commercial distribution should move to signed PowerShell, signed binaries/installer media, formal code-signing policy, threat modeling, dependency governance and an enterprise authentication architecture.
 

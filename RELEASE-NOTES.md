@@ -1,3 +1,13 @@
+# Unreleased
+
+## Security hardening after v3.1.0
+
+- Fresh installations persist the launching Windows identity as the initial Administrator mapping.
+- Identities without an explicit mapping fall back to Viewer rather than inheriting an Administrator default.
+- The v3.1.0 release/tag remains unchanged; these changes are proposed for a future release.
+
+---
+
 # Hyper-V Web Provisioning Studio v3.1.0 Professional
 
 ## Release highlights

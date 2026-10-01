@@ -56,7 +56,7 @@ function currentIdentity() {
 }
 function roleForIdentity(identity) {
   const mapped = store.get('users').find(x => String(x.username).toLowerCase() === identity.toLowerCase());
-  return mapped?.role || store.get('settings').defaultRole || CONFIG.professional.defaultRole || 'Administrator';
+  return mapped?.role || 'Viewer';
 }
 function hasPermission(permission) {
   const role = roleForIdentity(currentIdentity());
@@ -513,6 +513,22 @@ async function importLegacyV2Data() {
 async function startServer() {
   await ensureDirs();
   await store.init();
+
+  // First-run security bootstrap:
+  // Persist the Windows identity that launched the portal as Administrator only
+  // when the management store has no user mappings yet. Once any mappings exist,
+  // unmapped identities fall back to the least-privileged Viewer role.
+  if (store.get('users').length === 0) {
+    await store.add('users', {
+      id: safeId(),
+      username: currentIdentity(),
+      role: 'Administrator',
+      bootstrap: true,
+      createdAt: now(),
+      updatedAt: now()
+    });
+  }
+
   await importLegacyV2Data();
   initialized = true;
   const app = express();

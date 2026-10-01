@@ -20,7 +20,7 @@ class EmbeddedStore {
       schemaVersion: 1,
       metadata: { createdAt: now, updatedAt: now, provider: 'embedded-json', product: 'Hyper-V Web Provisioning Studio Professional' },
       settings: {
-        defaultRole: 'Administrator',
+        defaultRole: 'Viewer',
         auditIntegrity: 'sha256-chain',
         policyEnforcementDefault: false,
         jobHistoryLimit: 500,
